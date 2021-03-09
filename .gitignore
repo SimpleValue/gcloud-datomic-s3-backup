@@ -1,0 +1,6 @@
+/extra-libs
+.clj-kondo/
+.cpcache/
+.lsp/
+.nrepl-port
+/config.edn

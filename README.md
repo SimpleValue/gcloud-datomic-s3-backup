@@ -85,3 +85,15 @@ TODO
 - As alternative the container should mount a volume to the `/backup`
   folder, so that the data survive a container restart. While `gsutil
   rsync` is used to synchronize the data to Google Cloud Storage.
+
+## ToDo
+
+- `gsutil rsync` lists all entries of the source and the destination
+  folder. Check how many Google Cloud Storage API calls are done for a
+  Datomic backup of around 1 million segment files.
+
+- A custom copy process for Google Cloud Storage could leverage the
+  fact that the segment files are immutable and use squuids. The later
+  have a time-based portion, which would allow to do way less checks
+  to find out the segment files, that are new and must be uploaded to
+  Cloud Storage.

@@ -97,3 +97,10 @@ TODO
   have a time-based portion, which would allow to do way less checks
   to find out the segment files, that are new and must be uploaded to
   Cloud Storage.
+
+- [s3proxy](https://github.com/gaul/s3proxy) and Google Cloud's own
+  [simple migration from
+  S3](https://cloud.google.com/storage/docs/migrating#migration-simple)
+  could be options to directly write the Datomic backup to Google
+  Cloud Storage. Regrettably, there seems to be now way to change the
+  S3 endpoint that the Datomic backup process uses.

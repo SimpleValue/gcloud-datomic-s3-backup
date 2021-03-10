@@ -17,7 +17,6 @@ your Datomic database that is running on Google Cloud:
 - Access to Google Cloud SQL is often only possible via Cloud SQL
   Proxy
 
-
 This tool tries to overcome these obstacles. The `bin/build.clj`
 script builds a Docker container that includes all necessary tools to
 execute the backup:
@@ -26,17 +25,15 @@ execute the backup:
   registry (like http://gcr.io/), so that you do not redistribute
   Datomic Pro to a public Docker repository.
 
-- [gcsfuse](https://github.com/GoogleCloudPlatform/gcsfuse/) is used
-  to mount the Google Cloud Storage bucket to the local file
-  system. Thereby it is possible to do incremental Datomic backups in
-  combination with Google Cloud storage.
-
 - `-Ddatomic.backupPaceMsec=5` is used as option to slow down the
   Datomic `backup-db` process and decrease the load on the storage
   database.
 
 - [Cloud SQL proxy](https://cloud.google.com/sql/docs/mysql/sql-proxy)
   is included in the image to allow the connection to Google Cloud SQL.
+
+- [gsutil](https://cloud.google.com/storage/docs/gsutil) to copy the
+  files to Google Cloud Storage.
 
 ## Building the Docker image
 
@@ -49,9 +46,9 @@ Clone this Git repository and create a `config.edn` in top-level folder:
  :extra-libs ["https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.39/mysql-connector-java-5.1.39.jar"]}
 ```
 
-- Replace `%%email:password%%` and fill in your email and password that
-you use to log into
-[https://my.datomic.com/](https://my.datomic.com/).
+- Replace `%%email:password%%` and fill in your email and password
+  that you use to log into
+  [https://my.datomic.com/](https://my.datomic.com/).
 
 - Replace `%%gcloud-project-id%%` with the project-id of your Google
   Cloud project. Replace the complete `:container-registry` value, if
@@ -72,3 +69,31 @@ of the image.
 ## Usage
 
 TODO
+
+## History
+
+- The first version used
+  [gcsfuse](https://github.com/GoogleCloudPlatform/gcsfuse/) to mount
+  the Google Cloud Storage bucket to the local file
+  system. Regrettably, gcsfuse is very slow, if you have many small
+  files. The Datomic backup that was used for the test run had almost
+  a million files and the copy process would probably have taken days
+  or weeks. After 1 hour around 120mb were copied. During a Datomic
+  backup that is stored to a local disk, the same amount of data is
+  written in serveral seconds.
+
+- As alternative the container should mount a volume to the `/backup`
+  folder, so that the data survive a container restart. While `gsutil
+  rsync` is used to synchronize the data to Google Cloud Storage.
+
+## ToDo
+
+- `gsutil rsync` lists all entries of the source and the destination
+  folder. Check how many Google Cloud Storage API calls are done for a
+  Datomic backup of around 1 million segment files.
+
+- A custom copy process for Google Cloud Storage could leverage the
+  fact that the segment files are immutable and use squuids. The later
+  have a time-based portion, which would allow to do way less checks
+  to find out the segment files, that are new and must be uploaded to
+  Cloud Storage.

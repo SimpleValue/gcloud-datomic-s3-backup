@@ -58,8 +58,17 @@
     {:out :inherit
      :err :inherit}))
 
+(defn check-exit-code
+  [process-result]
+  (if (= (:exit process-result)
+         0)
+    process-result
+    (throw (ex-info "non-zero exit-code"
+                    {:process-result process-result}))))
+
 (download-extra-libs! config)
-(build! config)
-(push! config)
+(check-exit-code (build! config))
+(check-exit-code (push! config))
+
 (println "Docker tag:\n"
          (get-docker-tag config))

@@ -3,14 +3,14 @@ FROM ubuntu:20.04
 ARG DATOMIC_VERSION="0.9.6014"
 ARG DATOMIC_CREDENTIALS
 
-# Installs [gcsfuse](https://github.com/GoogleCloudPlatform/gcsfuse/blob/master/docs/installing.md#ubuntu-and-debian-latest-releases)
-# to mount the Google Cloud storage bucket, where the Datomic backup should be stored.
-RUN apt-get update && apt-get install -y lsb-release gnupg2 curl && \
-    export GCSFUSE_REPO=gcsfuse-`lsb_release -c -s` && \
-    echo "deb http://packages.cloud.google.com/apt $GCSFUSE_REPO main" | tee /etc/apt/sources.list.d/gcsfuse.list && \
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-    apt-get update && \
-    apt-get install -y gcsfuse unzip openjdk-8-jdk
+RUN apt-get update && apt-get install -y apt-transport-https ca-certificates gnupg2 curl unzip openjdk-8-jre-headless tmux python3 python3-crcmod
+
+# python3-crcmod is important to make the [crc
+# checks](https://cloud.google.com/storage/docs/gsutil/addlhelp/CRC32CandInstallingcrcmod)
+# of `gsutil rsync` fast.
+
+RUN cp /usr/bin/python3 /usr/bin/python
+ENV PATH "$PATH:/gsutil"
 
 # Downloads Datomic PRO and creates the /backup folder (mount point for gcsfuse)
 RUN mkdir -p /backup && \
@@ -22,8 +22,13 @@ RUN mkdir -p /backup && \
 RUN curl https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -o cloud_sql_proxy && \
     chmod +x cloud_sql_proxy
 
-ADD backup.sh /backup.sh
+RUN curl -o gsutil.tar.gz "https://storage.googleapis.com/pub/gsutil.tar.gz" && \
+    tar xfz gsutil.tar.gz
 
 ADD extra-libs/* /datomic/lib/
+
+ADD boto /root/.boto
+
+ADD backup.sh /backup.sh
 
 ENTRYPOINT ["/backup.sh"]

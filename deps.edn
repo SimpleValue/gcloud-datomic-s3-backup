@@ -1,3 +1,2 @@
 {:deps {babashka/process {:mvn/version "0.0.1"}
-        babashka/babashka.curl {:mvn/version "0.0.3"}
-        org.clojure/tools.deps.alpha {:mvn/version "0.10.889"}}}
+        babashka/babashka.curl {:mvn/version "0.0.3"}}}

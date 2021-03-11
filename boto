@@ -1,6 +1,0 @@
-[Credentials]
-[Boto]
-[GoogleCompute]
-service_account = default
-[GSUtil]
-[OAuth2]

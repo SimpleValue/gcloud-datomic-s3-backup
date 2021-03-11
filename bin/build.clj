@@ -9,12 +9,6 @@
 (def config
   (edn/read-string (slurp "config.edn")))
 
-(defn get-docker-tag
-  [config]
-  (str (:container-registry config)
-       "/gcloud-datomic-backup:"
-       (:datomic-version config)))
-
 (defn download-file!
   [url dest-file]
   (io/copy
@@ -45,7 +39,7 @@
                         (:datomic-credentials config))
      "--build-arg" (str "DATOMIC_VERSION="
                         (:datomic-version config))
-     "-t" (get-docker-tag config)
+     "-t" (:docker-image config)
      "."]
     {:out :inherit
      :err :inherit}))
@@ -54,7 +48,7 @@
   [config]
   @(process/process
     ["docker" "push"
-     (get-docker-tag config)]
+     (:docker-image config)]
     {:out :inherit
      :err :inherit}))
 
@@ -71,4 +65,4 @@
 (check-exit-code (push! config))
 
 (println "Docker tag:\n"
-         (get-docker-tag config))
+         (:docker-image config))

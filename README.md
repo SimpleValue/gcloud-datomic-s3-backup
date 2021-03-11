@@ -95,6 +95,10 @@ TODO
   operations on Google Cloud storage, which costs almost $5, which is
   pretty expensive if you plan to do a Datomic backup every hour.
 
+  Also the restore of a Datomic backup will be more time consuming, if
+  you first have to download the one million files to the local disk
+  before Datomic can start to import them.
+
 ## ToDo
 
 - [s3proxy](https://github.com/gaul/s3proxy) and Google Cloud's own

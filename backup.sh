@@ -4,7 +4,8 @@ set -e
 
 # Optionally starts Cloud SQL Proxy to access the database that is used as Datomic storage:
 if [[ ! -z "$CLOUD_SQL_PROXY_INSTANCES" ]]; then
-    ./cloud_sql_proxy -instances="${CLOUD_SQL_PROXY_INSTANCES}" &
+    ./cloud_sql_proxy -instances="${CLOUD_SQL_PROXY_INSTANCES}" -log_debug_stdout &
+    # `-log_debug_stdout` avoids false positive error log entries in Google Cloud Logging.
 fi
 
 set -u

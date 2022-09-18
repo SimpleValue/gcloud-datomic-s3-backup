@@ -13,4 +13,4 @@ set -u
 cd /datomic
 
 # Starts the Datomic backup with a backupPaceMsec to avoid overloading the Datomic storage database:
-bin/datomic -Xms500m -Xmx500m -Ddatomic.backupPaceMsec=5 backup-db "$DATOMIC_URI" "$S3_URI"
+bin/datomic -Xms4g -Xmx4g -Ddatomic.backupPaceMsec=5 backup-db "$DATOMIC_URI" "$S3_URI"
